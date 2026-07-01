@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 function verifyAuth(request) {
   const authCookie = request.cookies.get('auth')?.value;
   return authCookie === process.env.ADMIN_PASSWORD;
