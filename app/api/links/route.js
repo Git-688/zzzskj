@@ -2,18 +2,18 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 function verifyAuth(request) {
   const authCookie = request.cookies.get('auth')?.value;
   return authCookie === process.env.ADMIN_PASSWORD;
 }
 
-// 新增链接（重复检测）
 export async function POST(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const linkData = await request.json();
   const db = getDb();
 
-  // 重复链接检测（相同URL）
   const existing = await db.execute({
     sql: `SELECT id FROM links WHERE url = ?`,
     args: [linkData.url.trim()]
@@ -22,7 +22,6 @@ export async function POST(request) {
     return NextResponse.json({ error: '该链接已存在，请勿重复添加' }, { status: 400 });
   }
 
-  // 计算排序
   let finalSort = linkData.sort;
   if (!finalSort) {
     const siblings = await db.execute({
@@ -42,13 +41,11 @@ export async function POST(request) {
   return NextResponse.json({ id, ...linkData, sort: finalSort });
 }
 
-// 更新链接
 export async function PUT(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const { id, title, url, desc, sort } = await request.json();
   const db = getDb();
 
-  // 重复检测（排除自身）
   const existing = await db.execute({
     sql: `SELECT id FROM links WHERE url = ? AND id != ?`,
     args: [url.trim(), id]
@@ -65,7 +62,6 @@ export async function PUT(request) {
   return NextResponse.json({ success: true });
 }
 
-// 删除链接
 export async function DELETE(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const { searchParams } = new URL(request.url);
