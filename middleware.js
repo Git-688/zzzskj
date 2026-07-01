@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getDb, initTables } from '@/lib/db';
+import { getDb, initTables } from './lib/db'; // 相对路径
 
 let tablesInitialized = false;
 
 export async function middleware(request) {
-  // 首次运行初始化表结构
   if (!tablesInitialized) {
     try {
       await initTables();
@@ -18,7 +17,6 @@ export async function middleware(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const { pathname } = request.nextUrl;
 
-  // 登录页、静态资源、公开API直接放行
   if (
     pathname.startsWith('/login') ||
     pathname.startsWith('/api/auth') ||
@@ -28,12 +26,10 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  // 1. 校验管理员密码
   if (authCookie === adminPassword) {
     return NextResponse.next();
   }
 
-  // 2. 校验临时密码（查询数据库）
   if (authCookie) {
     try {
       const db = getDb();
@@ -46,12 +42,9 @@ export async function middleware(request) {
       if (result.rows.length > 0) {
         return NextResponse.next();
       }
-    } catch (e) {
-      // 数据库异常走登录逻辑
-    }
+    } catch (e) {}
   }
 
-  // 未通过鉴权，重定向到登录页
   const loginUrl = new URL('/login', request.url);
   return NextResponse.redirect(loginUrl);
 }
