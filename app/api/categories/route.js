@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 function verifyAuth(request) {
   const authCookie = request.cookies.get('auth')?.value;
   return authCookie === process.env.ADMIN_PASSWORD;
 }
 
-// 新增分类
 export async function POST(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const { name, parentId = null, sort } = await request.json();
@@ -32,7 +33,6 @@ export async function POST(request) {
   return NextResponse.json({ id, name, parentId, sort: finalSort, visible: true });
 }
 
-// 更新分类
 export async function PUT(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const { id, name, sort, visible } = await request.json();
@@ -46,14 +46,12 @@ export async function PUT(request) {
   return NextResponse.json({ success: true });
 }
 
-// 删除分类（级联删除子分类和链接）
 export async function DELETE(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   const db = getDb();
 
-  // 获取所有子分类ID（包括自身）
   let idsToDelete = [id];
   const children = await db.execute({
     sql: `SELECT id FROM categories WHERE parentId = ?`,
@@ -66,7 +64,6 @@ export async function DELETE(request) {
     sql: `DELETE FROM categories WHERE id IN (${placeholders})`,
     args: idsToDelete
   });
-  // 删除这些分类下的链接
   await db.execute({
     sql: `DELETE FROM links WHERE categoryId IN (${placeholders})`,
     args: idsToDelete
