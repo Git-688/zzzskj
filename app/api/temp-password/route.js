@@ -10,7 +10,6 @@ function generatePassword() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// 自动清理过期/已吊销的记录
 async function cleanExpired(db) {
   const now = Date.now();
   await db.execute({
@@ -19,7 +18,6 @@ async function cleanExpired(db) {
   });
 }
 
-// 生成临时密码
 export async function POST(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   
@@ -34,13 +32,10 @@ export async function POST(request) {
     args: [password, createdAt, expireAt, durationSeconds]
   });
 
-  // 清理过期记录
   await cleanExpired(db);
-
   return NextResponse.json({ password, createdAt, expireAt });
 }
 
-// 获取历史记录（最多50条）
 export async function GET(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const db = getDb();
@@ -68,7 +63,6 @@ export async function GET(request) {
   return NextResponse.json(list);
 }
 
-// 吊销临时密码
 export async function DELETE(request) {
   if (!verifyAuth(request)) return NextResponse.json({ error: '未授权' }, { status: 401 });
   const { searchParams } = new URL(request.url);
