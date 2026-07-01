@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   const authCookie = request.cookies.get('auth')?.value;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -10,7 +12,6 @@ export async function GET(request) {
     return NextResponse.json({ isAdmin: true });
   }
 
-  // 临时用户
   if (authCookie) {
     try {
       const db = getDb();
@@ -26,9 +27,7 @@ export async function GET(request) {
           isForever: expireAt === null
         });
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   }
 
   return NextResponse.json({ isAdmin: false });
