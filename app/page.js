@@ -414,7 +414,7 @@ export default function HomePage() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">站长专属空间</h1>
+      <h1 className="page-title">站长の空间</h1>
 
       {/* 搜索栏 */}
       <div className="search-bar">
