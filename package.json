@@ -5,13 +5,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "pages:build": "npm install --legacy-peer-deps && npx @cloudflare/next-on-pages@1",
+    "pages:build": "npx @cloudflare/next-on-pages@1",
     "preview": "npm run pages:build && npx wrangler pages dev .vercel/output/static",
     "deploy": "echo skip deploy"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
-    "next": "^14.3.0",
+    "next": "14.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
