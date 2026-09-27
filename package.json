@@ -5,9 +5,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "pages:build": "npx @cloudflare/next-on-pages@1",
+    "pages:build": "npm install --legacy-peer-deps && npx @cloudflare/next-on-pages@1",
     "preview": "npm run pages:build && npx wrangler pages dev .vercel/output/static",
-    "deploy": "npm run pages:build && npx wrangler pages deploy .vercel/output/static"
+    "deploy": "echo skip deploy"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
