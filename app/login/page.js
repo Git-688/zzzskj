@@ -25,7 +25,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-box">
-        <h1>站长专属空间</h1>
+        <h1>站长の空间</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-item">
             <label>访问密码</label>
